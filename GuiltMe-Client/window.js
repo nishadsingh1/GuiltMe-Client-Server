@@ -1,16 +1,16 @@
 $(document).ready(function() {
-  chrome.runtime.sendMessage({message: "send_request"}, function(response) {
-    url_to_time = response;
-    urls = Object.keys(url_to_time);
+  chrome.runtime.sendMessage({message: "initializing"}, function(response) {
+    url_to_time = response['url_to_time'];
+    classification_to_url = response['classification_to_url'];
     send_request();
   });
 });
 
-var server_classify_url =  "http://localhost:3000/classify";
-var server_datapoint_url =  "http://localhost:3000/datapoint";
+var server_classify_url = "http://localhost:3000/classify";
+var server_datapoint_url = "http://localhost:3000/datapoint";
 var result;
 var url_to_time;
-var urls;
+var classification_to_url;
 var work_domains = {};
 var procrastination_domains = {};
 
@@ -25,7 +25,7 @@ var hash = function(string) {
     for (i = 0, len = string.length; i < len; i++) {
       chr   = string.charCodeAt(i);
       hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
+      hash |= 0;
     }
     return hash;
 };
@@ -123,7 +123,7 @@ var Row = function(url, domain) {
   this.generate_html = function(fromSwitch) {
     var row_object = $(
       '<tr class=' + row_class + ' id=' + this.id + '><td>' +
-      '<a href=""'+this.url+'">' + this.get_formatted_url() + '</a></td><td>' +
+      '<a href="'+this.url+'">' + this.get_formatted_url() + '</a></td><td>' +
       this.formatted_time + '</td></tr>'
     );
 
@@ -132,12 +132,19 @@ var Row = function(url, domain) {
     var cement_button = $('<button type="button" disabled="true" class="'+cemented_button_class+'">Keep</button>');
 
     var classification = this.get_classification();
-    var other_classification = classification == 'work' ? 'procrastination' : 'work'
+    var other_classification = classification == 'work' ? 'procrastination' : 'work';
+    var me = this;
  
     var keep_success = function() {
+      manual_cache_classification(me.url, me.get_classification());
+      cement();
+    };
+
+    var cement = function() {
       keep_button.hide();
       cement_button.show();
-    }
+    };
+
     keep_button.click(function() {
       $.ajax({type: "POST", url: server_datapoint_url, data: {url: "http://www.google.com", classification: classification }, success: keep_success});
     });
@@ -145,8 +152,6 @@ var Row = function(url, domain) {
     switch_button.click(function() {
       $.ajax({type: "POST", url: server_datapoint_url, data: {url: "http://www.google.com", classification: other_classification }, success: switch_success});
     });
-    
-    var me = this;
 
     var switch_success = function() {
       var old_domain = me.get_domain();
@@ -172,7 +177,9 @@ var Row = function(url, domain) {
       me.domain = domain;
       domain.url_rows.push(me);
       me.generate_html(true);
-      domain.set_time()
+      domain.set_time();
+
+      manual_cache_classification(me.url, other_classification);
     };
 
     keep_button.appendTo(row_object);
@@ -182,15 +189,42 @@ var Row = function(url, domain) {
 
     this.get_table().find('tbody').append(row_object);
 
-    if (fromSwitch) {
-      keep_success();
+    if (fromSwitch || classification_to_url['work'].indexOf(this.url) != -1 || classification_to_url['procrastination'].indexOf(url) != -1) {
+      cement();
     }
   }
 };
 
+var cache_classification = function(mapping) {
+  chrome.runtime.sendMessage({message: 'server_classification', data:mapping}, function(response) {
+    }
+  );
+};
+
+var manual_cache_classification = function(url, classification) {
+  chrome.runtime.sendMessage({message: 'manual_classification', url: url, classification: classification}, function(response) {
+    }
+  );
+};
+
 var send_request = function(){
-  var data = {"history": urls};
-  $.ajax({type: "POST", url: server_classify_url, data: data, success: success, dataType: "json"});
+  var urls = Object.keys(url_to_time);
+  var needs_classification = [];
+
+  for (i = 0; i < urls.length; i++) {
+    url = urls[i];
+    if (!((classification_to_url['work'].indexOf(url) != -1) || (classification_to_url['procrastination'].indexOf(url) != -1))) {
+      needs_classification.push(url);
+    }
+  }
+  
+  if (needs_classification.length > 0) {
+    var data = {"history": needs_classification};
+    $.ajax({type: "POST", url: server_classify_url, data: data, success: success, dataType: "json"});
+  } else {
+    success({procrastination:[], work:[]});
+  }
+  
 };
 
 var get_domain_name = function(url){
@@ -200,7 +234,15 @@ var get_domain_name = function(url){
 };
 
 var success = function(response) {
-  result = response;
+  already_classified_work = classification_to_url['work'];
+  already_classified_procrastination = classification_to_url['procrastination'];
+  cache_classification(response);
+
+  result = {
+    work: $.unique(already_classified_work.concat(response['work'])),
+    procrastination: $.unique(already_classified_procrastination.concat(response['procrastination'])),
+  };
+
   create_rows('work', work_domains);
   create_rows('procrastination', procrastination_domains);
 
