@@ -1,10 +1,18 @@
 $(document).ready(function() {
+  kickstart();
+});
+
+
+
+var kickstart = function() {
   chrome.runtime.sendMessage({message: "initializing"}, function(response) {
     url_to_time = response['url_to_time'];
     classification_to_url = response['classification_to_url'];
+    work_domains = {};
+    procrastination_domains = {};
     send_request();
   });
-});
+};
 
 var server_classify_url = "http://localhost:3000/classify";
 var server_datapoint_url = "http://localhost:3000/datapoint";

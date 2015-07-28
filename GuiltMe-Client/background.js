@@ -1,7 +1,8 @@
 var last_time = new Date().getTime() / 1000;
 var last_url =  "chrome://newtab/";
 var url_to_time = {};
-var classification_to_url = { work: [], procrastination: [] };
+var server_classification_to_url = { work: [], procrastination: [] };
+var manual_classification_to_url = { work: [], procrastination: [] };
 var update =  function(current_url){
   var now = new Date().getTime() / 1000;
   var difference = now - last_time;
@@ -21,7 +22,8 @@ chrome.runtime.onMessage.addListener(
       sendResponse(
         {
           url_to_time: url_to_time,
-          classification_to_url: classification_to_url,
+          server_classification_to_url: server_classification_to_url,
+          manual_classification_to_url: manual_classification_to_url,
         }
       );
     } else if (request.message == 'server_classification') {
@@ -33,15 +35,23 @@ chrome.runtime.onMessage.addListener(
     } else {
       var url = request.url;
       var classification = request.classification;
-      if (!(url in classification_to_url[classification])) {
-        var other_classification = classification == 'work' ? 'procrastination' : 'work';
-        var other_class_urls = classification_to_url[other_classification];
-        if (url in cother_class_urls) {
-          other_class_urls.splice(other_class_urls.indexOf(url), 1);
-        }
-        classification_to_url[classification].push(url);
+      var other_classification = classification == 'work' ? 'procrastination' : 'work';
+      var server_classification_other_class_urls = server_classification_to_url[other_classification];
+      var server_classification_class_urls = server_classification_to_url[classification];
+      var manual_classification_other_class_urls = manual_classification_class_urls[classification];
+      var manual_classification_class_urls = manual_classification_class_urls[classification];
+
+      if (url in server_classification_other_class_urls) {
+        server_classification_other_class_urls.splice(server_classification_other_class_urls.indexOf(url), 1);
       }
-    }
+      if (url in server_classification_class_urls) {
+        server_classification_class_urls.splice(server_classification_class_urls.indexOf(url), 1);
+      }
+      if (url in manual_classification_other_class_urls) {
+        manual_classification_other_class_urls.splice(manual_classification_other_class_urls.indexOf(url), 1);
+      }
+
+      manual_classification_class_urls[classification].push(url);
   }
 );
 
