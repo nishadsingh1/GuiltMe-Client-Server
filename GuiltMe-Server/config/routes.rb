@@ -9,7 +9,8 @@ Guiltme::Application.routes.draw do
 
 
   resources :datapoint, :defaults => { :format => :json }
-  get 'classify', to: 'classification#classify', :defaults => { :format => :json }
+  get 'classify_url', to: 'classification#classify_url', :defaults => { :format => :json }
+  # get 'classify', to: 'classification#classify', :defaults => { :format => :json }
   post 'learn', to: 'learning#learn', :deftaults => { :format => :json }
   # Sample of named route:
   #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
