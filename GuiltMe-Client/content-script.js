@@ -47,9 +47,7 @@ var ClassificationsBox = React.createClass({
 		this.updateBackground(new_state);
 	},
 	updateBackground: function updateBackground(new_state) {
-		chrome.runtime.sendMessage({message: 'update', data: new_state}, function(response) {
-			/* Do nothing – already am udated */
-    	});
+		chrome.runtime.sendMessage({message: 'update', data: new_state}, function(response) {});
 	},
 	handleConfirm: function handleConfirm(url) {
 		var work_urls = this.state.work_urls;
@@ -283,8 +281,6 @@ $( document ).ready(function() {
   				React.createElement(ClassificationsBox, {urls: request.data}),
   				document.getElementById('content')
   			);
-  			console.log("I should have updated");
-  			prop.updateMe(request.data);
   		}
   	});
 });
