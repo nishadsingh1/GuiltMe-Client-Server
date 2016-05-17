@@ -3,55 +3,73 @@
 var ClassificationsBox = React.createClass({
 	getInitialState: function() {
 		return {
-			work_urls: {"www.wikiepdia.org": "1 hour 3 minutes", "www.google.com": "27 minutes"},
-			work_urls_confirmed: {"www.berkeley.edu": "1 hour 17 minutes", "www.hyperphysics.org": "12 minutes"},
-			procrastination_urls: {"www.reddit.com": "7 hours 20 minutes", "na.lolesports.com": "45 minutes"},
-			procrastination_urls_confirmed: {"www.facebook.com": "2 hours 3 minutes", "www.airbnb.com": "2 minutes"}
+			work_urls: this.props.urls.work_urls,
+			work_urls_confirmed: this.props.urls.work_urls_confirmed,
+			procrastination_urls: this.props.urls.procrastination_urls,
+			procrastination_urls_confirmed: this.props.urls.procrastination_urls_confirmed
 		};
 	},
-	handleSwitch: function (url) {
+	handleSwitch: function handleSwitch(url) {
 		var work_urls = this.state.work_urls;
 		var work_urls_confirmed = this.state.work_urls_confirmed;
 		var procrastination_urls = this.state.procrastination_urls;
 		var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
-		if (url in work_urls) {
-			procrastination_urls_confirmed[url] = work_urls[url];
-			delete work_urls[url];
-		} else if (url in work_urls_confirmed) {
-			procrastination_urls_confirmed[url] = work_urls_confirmed[url];
-			delete work_urls_confirmed[url];
-		} else if (url in procrastination_urls) {
-			work_urls_confirmed[url] = procrastination_urls[url];
-			delete procrastination_urls[url];
-		} else if (url in procrastination_urls_confirmed) {
-			work_urls_confirmed[url] = procrastination_urls_confirmed[url];
-			delete procrastination_urls_confirmed[url];
+		var get_classifications = function() {
+			if (url in work_urls) {
+				return [work_urls, procrastination_urls_confirmed];
+			} else if (url in work_urls_confirmed) {
+				return [work_urls_confirmed, procrastination_urls_confirmed];
+			} else if (url in procrastination_urls) {
+				return [procrastination_urls, work_urls_confirmed];
+			} else if (url in procrastination_urls_confirmed) {
+				return [procrastination_urls_confirmed, work_urls_confirmed];
+			}
 		}
-		this.setState({
+
+		var classifications = get_classifications();
+		var old_url_classification = classifications[0];
+		var new_url_classification = classifications[1];
+		var new_url_classification_name = "procrastination_urls_confirmed";
+		if (new_url_classification == work_urls_confirmed) {
+			new_url_classification_name = "work_urls_confirmed";
+		}
+		new_url_classification[url] = old_url_classification[url];
+		delete old_url_classification[url];
+		var new_state = {
 			work_urls: work_urls,
 			work_urls_confirmed: work_urls_confirmed,
 			procrastination_urls: procrastination_urls,
-			procrastination_urls_confirmed: procrastination_urls_confirmed,
-		});
+			procrastination_urls_confirmed: procrastination_urls_confirmed
+		};
+		this.setState(new_state);
+		this.updateBackground(new_state);
 	},
-	handleConfirm: function(url) {
+	updateBackground: function updateBackground(new_state) {
+		chrome.runtime.sendMessage({message: 'update', data: new_state}, function(response) {});
+	},
+	handleConfirm: function handleConfirm(url) {
 		var work_urls = this.state.work_urls;
 		var work_urls_confirmed = this.state.work_urls_confirmed;
 		var procrastination_urls = this.state.procrastination_urls;
 		var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+		var new_classification_name;
 		if (url in work_urls) {
 			work_urls_confirmed[url] = work_urls[url];
 			delete work_urls[url];
+			new_classification_name = "work_urls_confirmed";
 		} else {
 			procrastination_urls_confirmed[url] = procrastination_urls[url];
 			delete procrastination_urls[url];
+			new_classification_name = "procrastination_urls_confirmed";
 		}
-		this.setState({
+		var new_state = {
 			work_urls: work_urls,
 			work_urls_confirmed: work_urls_confirmed,
 			procrastination_urls: procrastination_urls,
-			procrastination_urls_confirmed: procrastination_urls_confirmed,
-		});
+			procrastination_urls_confirmed: procrastination_urls_confirmed
+		};
+		this.setState(new_state);
+		this.updateBackground(new_state);
 	},
 	render: function() {
 		return (
@@ -89,7 +107,7 @@ var ClassificationTable = React.createClass({
 	render: function() {
 		return (
 			<div className="classificationTable">
-				<table className="highlight">
+				<table className="highlight classificationTable">
 					<thead>
 							<ClassificationHeader classification={this.props.classification} />
 					</thead>
@@ -126,25 +144,21 @@ var UrlList = React.createClass({
 		};
 	},
 	render: function() {
-		var urls_confirmed_items = [];
 		var urls_items = [];
 		for(var url in this.state.urls_confirmed) {
-			urls_confirmed_items.push (
-				<tr>
-					<UrlItemConfirmed
-						key={url}
-						url={url}
-						time={this.state.urls_confirmed[url]}
-						classification={this.props.classification}
-						confirmed={true}
-						handleSwitch={this.props.handleSwitch}
-					/>
-				</tr>
+			urls_items.push (
+				<UrlItem
+					key={url}
+					url={url}
+					time={this.state.urls_confirmed[url]}
+					classification={this.props.classification}
+					confirmed={true}
+					handleSwitch={this.props.handleSwitch}
+				/>
 			);
 		}
 		for(var url in this.state.urls) {
 			urls_items.push (
-				<tr>
 					<UrlItem
 						key={url}
 						url={url}
@@ -154,13 +168,11 @@ var UrlList = React.createClass({
 						handleSwitch={this.props.handleSwitch}
 						handleConfirm={this.props.handleConfirm}
 					/>
-				</tr>
 			);
 		}
 		return (
 			<tbody className="urlList">
 				{urls_items}
-				{urls_confirmed_items}
 			</tbody>
 		);
 	}
@@ -169,43 +181,74 @@ var UrlList = React.createClass({
 var UrlItem = React.createClass({
 	render: function() {
 		return (
-			<td className="urlItem">
-				{this.props.url}: {this.props.time}
-					<button
-						onClick={this.props.handleSwitch.bind(null, this.props.url)}
-						className="btn-floating btn-small waves-effect waves-light red"
-					>
-						<i className="material-icons">shuffle</i>
-					</button>
-					<button
+			<tr>
+				<UrlItemText
+					url={this.props.url}
+					time={this.props.time}
+				/>
+				<UrlItemButtons
+					confirmed={this.props.confirmed}
+					handleSwitch={this.props.handleSwitch}
+					handleConfirm={this.props.handleConfirm}
+					url={this.props.url}
+				/>
+			</tr>
+		);
+	}
+});
+
+var UrlItemButtons = React.createClass({
+	render: function() {
+		var buttons = [
+			<button
+				onClick={this.props.handleSwitch.bind(null, this.props.url)}
+				className="btn-floating btn-small waves-effect waves-light red"
+			>
+				<i className="material-icons">shuffle</i>
+			</button>
+		];
+		if (!this.props.confirmed) {
+			buttons.push (
+				<button
 						onClick={this.props.handleConfirm.bind(null, this.props.url)}
 						className="btn-floating btn-small waves-effect waves-light green"
 					>
 						<i className="material-icons">done</i>
 					</button>
+			);
+		}
+		return (
+			<td className="urlItemButtons">
+				{buttons}
 			</td>
 		);
 	}
 });
 
-var UrlItemConfirmed = React.createClass({
+var UrlItemText = React.createClass({
 	render: function() {
 		return (
-			<td className="urlItem">
+			<td className="urlItemText">
 				{this.props.url}: {this.props.time}
-				<button
-					onClick={this.props.handleSwitch.bind(null, this.props.url)}
-					className="btn-floating btn-small waves-effect waves-light red right-align"
-				>
-					<i className="material-icons">shuffle</i>
-				</button>
-				
 			</td>
-		);	
+		);
 	}
 });
 
-ReactDOM.render(
-	<ClassificationsBox />,
-	document.getElementById('content')
-);
+
+$( document ).ready(function() {
+	chrome.runtime.sendMessage({message: "initialize"}, function(response) {
+		ReactDOM.render(
+					<ClassificationsBox urls={response}/>,
+					document.getElementById('content')
+				);
+  	});
+  	chrome.runtime.onMessage.addListener(function(request, sender, func) {
+  		if (request.message == 'update') {
+  			ReactDOM.render(
+					<ClassificationsBox urls={request.data}/>,
+					document.getElementById('content')
+				);
+  		}
+  	});
+});

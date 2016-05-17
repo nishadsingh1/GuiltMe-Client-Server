@@ -16,7 +16,7 @@
   "content_scripts": [ {
     "js": ["content-script.js"],
     "matches": [ "*://*.newtab/*"], 
-    "css": [ "materialize/css/materialize.min.css"]
+    "css": [ "materialize/css/materialize.min.css", "materialize/css/fonts.css"]
   }],
 
   "permissions": [

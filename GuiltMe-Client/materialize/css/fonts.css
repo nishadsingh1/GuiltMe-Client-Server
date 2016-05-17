@@ -22,3 +22,28 @@
   font-family: "Roboto";
   src: url("../font/roboto/Roboto-Bold.woff2") format("woff2"), url("../font/roboto/Roboto-Bold.woff") format("woff"), url("../font/roboto/Roboto-Bold.ttf") format("truetype");
   font-weight: 700; }
+
+.ss {
+    position: relative;
+    text-align: left;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.urlItemText {
+	width: 100%;
+	font-size: 14px;
+}
+
+.urlItemButtons {
+	width: auto;
+    text-align: right;
+    white-space: nowrap
+}
+
+.classificationTable {
+	width: 100%;
+}

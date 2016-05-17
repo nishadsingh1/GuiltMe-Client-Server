@@ -1,9 +1,9 @@
-"use strict";
+//guiltme.js
 
 var ClassificationsBox = React.createClass({
 	displayName: "ClassificationsBox",
 
-	getInitialState: function getInitialState() {
+	getInitialState: function () {
 		return {
 			work_urls: this.props.urls.work_urls,
 			work_urls_confirmed: this.props.urls.work_urls_confirmed,
@@ -16,7 +16,7 @@ var ClassificationsBox = React.createClass({
 		var work_urls_confirmed = this.state.work_urls_confirmed;
 		var procrastination_urls = this.state.procrastination_urls;
 		var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
-		var get_classifications = function() {
+		var get_classifications = function () {
 			if (url in work_urls) {
 				return [work_urls, procrastination_urls_confirmed];
 			} else if (url in work_urls_confirmed) {
@@ -26,7 +26,7 @@ var ClassificationsBox = React.createClass({
 			} else if (url in procrastination_urls_confirmed) {
 				return [procrastination_urls_confirmed, work_urls_confirmed];
 			}
-		}
+		};
 
 		var classifications = get_classifications();
 		var old_url_classification = classifications[0];
@@ -47,7 +47,7 @@ var ClassificationsBox = React.createClass({
 		this.updateBackground(new_state);
 	},
 	updateBackground: function updateBackground(new_state) {
-		chrome.runtime.sendMessage({message: 'update', data: new_state}, function(response) {});
+		chrome.runtime.sendMessage({ message: 'update', data: new_state }, function (response) {});
 	},
 	handleConfirm: function handleConfirm(url) {
 		var work_urls = this.state.work_urls;
@@ -73,7 +73,7 @@ var ClassificationsBox = React.createClass({
 		this.setState(new_state);
 		this.updateBackground(new_state);
 	},
-	render: function render() {
+	render: function () {
 		return React.createElement(
 			"div",
 			{ className: "classificationsBox row" },
@@ -106,19 +106,19 @@ var ClassificationsBox = React.createClass({
 var ClassificationTable = React.createClass({
 	displayName: "ClassificationTable",
 
-	getInitialState: function getInitialState() {
+	getInitialState: function () {
 		return {
 			urls: this.props.urls,
 			urls_confirmed: this.props.urls_confirmed
 		};
 	},
-	render: function render() {
+	render: function () {
 		return React.createElement(
 			"div",
 			{ className: "classificationTable" },
 			React.createElement(
 				"table",
-				{ className: "highlight" },
+				{ className: "highlight classificationTable" },
 				React.createElement(
 					"thead",
 					null,
@@ -139,7 +139,7 @@ var ClassificationTable = React.createClass({
 var ClassificationHeader = React.createClass({
 	displayName: "ClassificationHeader",
 
-	render: function render() {
+	render: function () {
 		return React.createElement(
 			"tr",
 			null,
@@ -155,49 +155,39 @@ var ClassificationHeader = React.createClass({
 var UrlList = React.createClass({
 	displayName: "UrlList",
 
-	getInitialState: function getInitialState() {
+	getInitialState: function () {
 		return {
 			urls: this.props.urls,
 			urls_confirmed: this.props.urls_confirmed
 		};
 	},
-	render: function render() {
-		var urls_confirmed_items = [];
+	render: function () {
 		var urls_items = [];
 		for (var url in this.state.urls_confirmed) {
-			urls_confirmed_items.push(React.createElement(
-				"tr",
-				null,
-				React.createElement(UrlItemConfirmed, {
-					key: url,
-					url: url,
-					time: this.state.urls_confirmed[url],
-					classification: this.props.classification,
-					confirmed: true,
-					handleSwitch: this.props.handleSwitch
-				})
-			));
+			urls_items.push(React.createElement(UrlItem, {
+				key: url,
+				url: url,
+				time: this.state.urls_confirmed[url],
+				classification: this.props.classification,
+				confirmed: true,
+				handleSwitch: this.props.handleSwitch
+			}));
 		}
 		for (var url in this.state.urls) {
-			urls_items.push(React.createElement(
-				"tr",
-				null,
-				React.createElement(UrlItem, {
-					key: url,
-					url: url,
-					time: this.state.urls[url],
-					classification: this.props.classification,
-					confirmed: false,
-					handleSwitch: this.props.handleSwitch,
-					handleConfirm: this.props.handleConfirm
-				})
-			));
+			urls_items.push(React.createElement(UrlItem, {
+				key: url,
+				url: url,
+				time: this.state.urls[url],
+				classification: this.props.classification,
+				confirmed: false,
+				handleSwitch: this.props.handleSwitch,
+				handleConfirm: this.props.handleConfirm
+			}));
 		}
 		return React.createElement(
 			"tbody",
 			{ className: "urlList" },
-			urls_items,
-			urls_confirmed_items
+			urls_items
 		);
 	}
 });
@@ -205,26 +195,42 @@ var UrlList = React.createClass({
 var UrlItem = React.createClass({
 	displayName: "UrlItem",
 
-	render: function render() {
+	render: function () {
 		return React.createElement(
-			"td",
-			{ className: "urlItem" },
-			this.props.url,
-			": ",
-			this.props.time,
+			"tr",
+			null,
+			React.createElement(UrlItemText, {
+				url: this.props.url,
+				time: this.props.time
+			}),
+			React.createElement(UrlItemButtons, {
+				confirmed: this.props.confirmed,
+				handleSwitch: this.props.handleSwitch,
+				handleConfirm: this.props.handleConfirm,
+				url: this.props.url
+			})
+		);
+	}
+});
+
+var UrlItemButtons = React.createClass({
+	displayName: "UrlItemButtons",
+
+	render: function () {
+		var buttons = [React.createElement(
+			"button",
+			{
+				onClick: this.props.handleSwitch.bind(null, this.props.url),
+				className: "btn-floating btn-small waves-effect waves-light red"
+			},
 			React.createElement(
-				"button",
-				{
-					onClick: this.props.handleSwitch.bind(null, this.props.url),
-					className: "btn-floating btn-small waves-effect waves-light red"
-				},
-				React.createElement(
-					"i",
-					{ className: "material-icons" },
-					"shuffle"
-				)
-			),
-			React.createElement(
+				"i",
+				{ className: "material-icons" },
+				"shuffle"
+			)
+		)];
+		if (!this.props.confirmed) {
+			buttons.push(React.createElement(
 				"button",
 				{
 					onClick: this.props.handleConfirm.bind(null, this.props.url),
@@ -235,52 +241,38 @@ var UrlItem = React.createClass({
 					{ className: "material-icons" },
 					"done"
 				)
-			)
-		);
-	}
-});
-
-var UrlItemConfirmed = React.createClass({
-	displayName: "UrlItemConfirmed",
-
-	render: function render() {
+			));
+		}
 		return React.createElement(
 			"td",
-			{ className: "urlItem" },
-			this.props.url,
-			": ",
-			this.props.time,
-			React.createElement(
-				"button",
-				{
-					onClick: this.props.handleSwitch.bind(null, this.props.url),
-					className: "btn-floating btn-small waves-effect waves-light red right-align"
-				},
-				React.createElement(
-					"i",
-					{ className: "material-icons" },
-					"shuffle"
-				)
-			)
+			{ className: "urlItemButtons" },
+			buttons
 		);
 	}
 });
 
-$( document ).ready(function() {
-	var prop;
-	chrome.runtime.sendMessage({message: "initialize"}, function(response) {
-		prop = React.createElement(ClassificationsBox, {urls: response});
-		ReactDOM.render(
-			prop,
-			document.getElementById('content')
+var UrlItemText = React.createClass({
+	displayName: "UrlItemText",
+
+	render: function () {
+		return React.createElement(
+			"td",
+			{ className: "urlItemText" },
+			this.props.url,
+			": ",
+			this.props.time
 		);
-  	});
-  	chrome.runtime.onMessage.addListener(function(request, sender, func) {
-  		if (request.message == 'update') {
-  			ReactDOM.render(
-  				React.createElement(ClassificationsBox, {urls: request.data}),
-  				document.getElementById('content')
-  			);
-  		}
-  	});
+	}
 });
+
+$(document).ready(function () {
+	chrome.runtime.sendMessage({ message: "initialize" }, function (response) {
+		ReactDOM.render(React.createElement(ClassificationsBox, { urls: response }), document.getElementById('content'));
+	});
+	chrome.runtime.onMessage.addListener(function (request, sender, func) {
+		if (request.message == 'update') {
+			ReactDOM.render(React.createElement(ClassificationsBox, { urls: request.data }), document.getElementById('content'));
+		}
+	});
+});
+
