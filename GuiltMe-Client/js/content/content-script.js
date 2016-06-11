@@ -1,5 +1,4 @@
-//guiltme.js
-var ClassificationsBox = React.createClass({
+const ClassificationsBox = React.createClass({
 	displayName: "ClassificationsBox",
 
 	getInitialState: function () {
@@ -10,12 +9,12 @@ var ClassificationsBox = React.createClass({
 			procrastination_urls_confirmed: this.props.urls.procrastination_urls_confirmed
 		};
 	},
-	handleSwitch: function handleSwitch(url) {
-		var work_urls = this.state.work_urls;
-		var work_urls_confirmed = this.state.work_urls_confirmed;
-		var procrastination_urls = this.state.procrastination_urls;
-		var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
-		var get_classifications = function () {
+	handleSwitch: function (url) {
+		const work_urls = this.state.work_urls;
+		const work_urls_confirmed = this.state.work_urls_confirmed;
+		const procrastination_urls = this.state.procrastination_urls;
+		const procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+		const get_old_and_new_url_classification = function () {
 			if (url in work_urls) {
 				return [work_urls, procrastination_urls_confirmed];
 			} else if (url in work_urls_confirmed) {
@@ -27,33 +26,31 @@ var ClassificationsBox = React.createClass({
 			}
 		};
 
-		var classifications = get_classifications();
-		var old_url_classification = classifications[0];
-		var new_url_classification = classifications[1];
-		var new_url_classification_name = "procrastination_urls_confirmed";
-		if (new_url_classification == work_urls_confirmed) {
-			new_url_classification_name = "work_urls_confirmed";
-		}
+		const classifications = get_old_and_new_url_classification();
+		const old_url_classification = classifications[0];
+		const new_url_classification = classifications[1];
+		const new_url_classification_name = new_url_classification == work_urls_confirmed ? "work_urls_confirmed" : "procrastination_urls_confirmed";
+
 		new_url_classification[url] = old_url_classification[url];
 		delete old_url_classification[url];
-		var new_state = {
-			work_urls: work_urls,
-			work_urls_confirmed: work_urls_confirmed,
-			procrastination_urls: procrastination_urls,
-			procrastination_urls_confirmed: procrastination_urls_confirmed
-		};
-		this.setState(new_state);
-		this.updateBackground(new_state);
+
+		this.update({
+			work_urls,
+			work_urls_confirmed,
+			procrastination_urls,
+			procrastination_urls_confirmed
+		});
 	},
-	updateBackground: function updateBackground(new_state) {
+	update: function (new_state) {
+		this.setState(new_state);
 		chrome.runtime.sendMessage({ message: 'update', data: new_state }, function (response) {});
 	},
-	handleConfirm: function handleConfirm(url) {
-		var work_urls = this.state.work_urls;
-		var work_urls_confirmed = this.state.work_urls_confirmed;
-		var procrastination_urls = this.state.procrastination_urls;
-		var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
-		var new_classification_name;
+	handleConfirm: function (url) {
+		const work_urls = this.state.work_urls;
+		const work_urls_confirmed = this.state.work_urls_confirmed;
+		const procrastination_urls = this.state.procrastination_urls;
+		const procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+		let new_classification_name;
 		if (url in work_urls) {
 			work_urls_confirmed[url] = work_urls[url];
 			delete work_urls[url];
@@ -63,16 +60,14 @@ var ClassificationsBox = React.createClass({
 			delete procrastination_urls[url];
 			new_classification_name = "procrastination_urls_confirmed";
 		}
-		var new_state = {
-			work_urls: work_urls,
-			work_urls_confirmed: work_urls_confirmed,
-			procrastination_urls: procrastination_urls,
-			procrastination_urls_confirmed: procrastination_urls_confirmed
-		};
-		this.setState(new_state);
-		this.updateBackground(new_state);
+		this.update({
+			work_urls,
+			work_urls_confirmed,
+			procrastination_urls,
+			procrastination_urls_confirmed
+		});
 	},
-	onUrlItemSelect: function onUrlItemSelect(url) {
+	onUrlItemSelect: function (url) {
 		console.log(url + " was clicked!");
 	},
 	render: function () {
@@ -107,15 +102,9 @@ var ClassificationsBox = React.createClass({
 	}
 });
 
-var ClassificationTable = React.createClass({
+const ClassificationTable = React.createClass({
 	displayName: "ClassificationTable",
 
-	getInitialState: function () {
-		return {
-			urls: this.props.urls,
-			urls_confirmed: this.props.urls_confirmed
-		};
-	},
 	render: function () {
 		return React.createElement(
 			"div",
@@ -131,8 +120,8 @@ var ClassificationTable = React.createClass({
 				React.createElement(UrlList, {
 					onUrlItemSelect: this.props.onUrlItemSelect,
 					classification: this.props.classification,
-					urls_confirmed: this.state.urls_confirmed,
-					urls: this.state.urls,
+					urls_confirmed: this.props.urls_confirmed,
+					urls: this.props.urls,
 					handleSwitch: this.props.handleSwitch,
 					handleConfirm: this.props.handleConfirm
 				})
@@ -141,7 +130,7 @@ var ClassificationTable = React.createClass({
 	}
 });
 
-var ClassificationHeader = React.createClass({
+const ClassificationHeader = React.createClass({
 	displayName: "ClassificationHeader",
 
 	render: function () {
@@ -153,33 +142,28 @@ var ClassificationHeader = React.createClass({
 	}
 });
 
-var UrlList = React.createClass({
+const UrlList = React.createClass({
 	displayName: "UrlList",
 
-	getInitialState: function () {
-		return {
-			urls: this.props.urls,
-			urls_confirmed: this.props.urls_confirmed
-		};
-	},
 	render: function () {
-		var urls_items = [];
-		for (var url in this.state.urls_confirmed) {
+		const urls_items = [];
+		let url;
+		for (url in this.props.urls_confirmed) {
 			urls_items.push(React.createElement(UrlItem, {
 				key: url,
 				url: url,
-				time: this.state.urls_confirmed[url],
+				time: this.props.urls_confirmed[url],
 				classification: this.props.classification,
 				confirmed: true,
 				onClick: this.props.onUrlItemSelect.bind(null, url),
 				handleSwitch: this.props.handleSwitch
 			}));
 		}
-		for (var url in this.state.urls) {
+		for (url in this.props.urls) {
 			urls_items.push(React.createElement(UrlItem, {
 				key: url,
 				url: url,
-				time: this.state.urls[url],
+				time: this.props.urls[url],
 				classification: this.props.classification,
 				confirmed: false,
 				onClick: this.props.onUrlItemSelect.bind(null, url),
@@ -195,7 +179,7 @@ var UrlList = React.createClass({
 	}
 });
 
-var UrlItem = React.createClass({
+const UrlItem = React.createClass({
 	displayName: "UrlItem",
 
 	render: function () {
@@ -216,11 +200,11 @@ var UrlItem = React.createClass({
 	}
 });
 
-var UrlItemButtons = React.createClass({
+const UrlItemButtons = React.createClass({
 	displayName: "UrlItemButtons",
 
 	render: function () {
-		var buttons = [React.createElement(
+		const buttons = [React.createElement(
 			"button",
 			{
 				key: "switch",
@@ -256,7 +240,7 @@ var UrlItemButtons = React.createClass({
 	}
 });
 
-var UrlItemText = React.createClass({
+const UrlItemText = React.createClass({
 	displayName: "UrlItemText",
 
 	render: function () {
@@ -270,7 +254,7 @@ var UrlItemText = React.createClass({
 	}
 });
 
-var UrlItemUrlText = React.createClass({
+const UrlItemUrlText = React.createClass({
 	displayName: "UrlItemUrlText",
 
 	render: function () {
@@ -282,7 +266,7 @@ var UrlItemUrlText = React.createClass({
 	}
 });
 
-var UrlItemTimeText = React.createClass({
+const UrlItemTimeText = React.createClass({
 	displayName: "UrlItemTimeText",
 
 	render: function () {
@@ -304,5 +288,4 @@ $(document).ready(function () {
 		}
 	});
 });
-// ../../node_modules/.bin/babel content-script-jsx.js > content-script.js
 
