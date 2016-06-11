@@ -28,10 +28,6 @@ const ClassificationsBox = React.createClass({
 		const classifications = get_old_and_new_url_classification();
 		const old_url_classification = classifications[0];
 		const new_url_classification = classifications[1];
-		const new_url_classification_name =
-			new_url_classification == work_urls_confirmed 
-			? "work_urls_confirmed"
-			: "procrastination_urls_confirmed" 
 
 		new_url_classification[url] = old_url_classification[url];
 		delete old_url_classification[url];
@@ -45,7 +41,7 @@ const ClassificationsBox = React.createClass({
 	},
 	update: function(new_state) {
 		this.setState(new_state);
-		chrome.runtime.sendMessage({message: 'update', data: new_state}, function(response) {});
+		chrome.runtime.sendMessage({message: UPDATE, data: new_state}, function(response) {});
 	},
 	handleConfirm: function(url) {
 		const work_urls = this.state.work_urls;

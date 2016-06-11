@@ -1,11 +1,12 @@
 const new_tab_url = "chrome://newtab/";
-const procrastination_urls = {}
-const procrastination_urls_confirmed = {}
 const server_classify_url = "http://localhost:3000/classify_url"
-const work_urls = {}
-const work_urls_confirmed = {}
+
 let last_time = new Date().getTime() / 1000;
 let last_url = new_tab_url;
+let procrastination_urls = {}
+let procrastination_urls_confirmed = {}
+let work_urls = {}
+let work_urls_confirmed = {}
 
 function extractDomain(url) {
     let domain;
@@ -61,7 +62,7 @@ const update = function(current_url) {
 
 chrome.runtime.onMessage.addListener( 
   function(request, sender, sendResponse) {
-    if (request.message == 'initialize') {
+    if (request.message == INITIALIZE) {
       // delete current_classification("chrome://newtab/")["chrome://newtab/"];
       sendResponse(
         {
@@ -71,7 +72,7 @@ chrome.runtime.onMessage.addListener(
           procrastination_urls_confirmed: procrastination_urls_confirmed,
         }
       );
-    } else if (request.message == 'update') {
+    } else if (request.message == UPDATE) {
       work_urls = request.data.work_urls;
       procrastination_urls = request.data.procrastination_urls;
       procrastination_urls_confirmed = request.data.procrastination_urls_confirmed;
