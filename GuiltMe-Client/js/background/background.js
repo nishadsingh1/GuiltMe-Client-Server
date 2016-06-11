@@ -1,11 +1,11 @@
-let last_time = new Date().getTime() / 1000;
 const new_tab_url = "chrome://newtab/";
-let last_url =  new_tab_url;
+const procrastination_urls = {}
+const procrastination_urls_confirmed = {}
 const server_classify_url = "http://localhost:3000/classify_url"
 const work_urls = {}
 const work_urls_confirmed = {}
-const procrastination_urls = {}
-const procrastination_urls_confirmed = {}
+let last_time = new Date().getTime() / 1000;
+let last_url = new_tab_url;
 
 function extractDomain(url) {
     let domain;
@@ -33,7 +33,7 @@ const current_classification = function(url) {
   }
 }
 
-const update =  function(current_url) {
+const update = function(current_url) {
   current_url = extractDomain(current_url);
   const now = new Date().getTime() / 1000;
   const difference = now - last_time;
@@ -91,7 +91,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
   chrome.tabs.get(tabId, function(tab){
     if(tab.active){
       update(tab.url);
-    }  
+    }
   });
 });
 
