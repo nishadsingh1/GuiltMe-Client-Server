@@ -6,15 +6,15 @@
   "version": "1.0",
 
   "chrome_url_overrides": {
-    "newtab": "index.html"
+    "newtab": "html/index.html"
   },
 
   "background": {
-    "scripts": ["jquery-2.1.4.min.js", "background.js"]
+    "scripts": ["js/lib/jquery-2.1.4.min.js", "js/background/background.js"]
   },
 
   "content_scripts": [ {
-    "js": ["content-script.js"],
+    "js": ["js/content/content-script.js"],
     "matches": [ "*://*.newtab/*"], 
     "css": [ "materialize/css/materialize.min.css", "materialize/css/fonts.css"]
   }],

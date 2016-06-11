@@ -1,5 +1,4 @@
 //guiltme.js
-
 var ClassificationsBox = React.createClass({
 	getInitialState: function() {
 		return {
@@ -71,11 +70,15 @@ var ClassificationsBox = React.createClass({
 		this.setState(new_state);
 		this.updateBackground(new_state);
 	},
+	onUrlItemSelect: function onUrlItemSelect(url) {
+		console.log(url + " was clicked!");
+	},
 	render: function() {
 		return (
 			<div className="classificationsBox row">
 					<div className="col s5 offset-s1">
 						<ClassificationTable
+							onUrlItemSelect={this.onUrlItemSelect}
 							urls={this.state.work_urls}
 							urls_confirmed={this.state.work_urls_confirmed}
 							classification="work"
@@ -85,6 +88,7 @@ var ClassificationsBox = React.createClass({
 					</div>
 					<div className="col s5">
 						<ClassificationTable
+							onUrlItemSelect={this.onUrlItemSelect}
 							urls={this.state.procrastination_urls}
 							urls_confirmed={this.state.procrastination_urls_confirmed}
 							classification="procrastination"
@@ -112,6 +116,7 @@ var ClassificationTable = React.createClass({
 							<ClassificationHeader classification={this.props.classification} />
 					</thead>
 					<UrlList
+						onUrlItemSelect={this.props.onUrlItemSelect}
 						classification={this.props.classification}
 						urls_confirmed={this.state.urls_confirmed}
 						urls={this.state.urls}
@@ -153,6 +158,7 @@ var UrlList = React.createClass({
 					time={this.state.urls_confirmed[url]}
 					classification={this.props.classification}
 					confirmed={true}
+					onClick={this.props.onUrlItemSelect.bind(null, url)}
 					handleSwitch={this.props.handleSwitch}
 				/>
 			);
@@ -165,6 +171,7 @@ var UrlList = React.createClass({
 						time={this.state.urls[url]}
 						classification={this.props.classification}
 						confirmed={false}
+						onClick={this.props.onUrlItemSelect.bind(null, url)}
 						handleSwitch={this.props.handleSwitch}
 						handleConfirm={this.props.handleConfirm}
 					/>
@@ -181,11 +188,12 @@ var UrlList = React.createClass({
 var UrlItem = React.createClass({
 	render: function() {
 		return (
-			<tr>
+			<tr onClick={this.props.onClick}>
 				<UrlItemText
 					url={this.props.url}
 					time={this.props.time}
 				/>
+				<br />
 				<UrlItemButtons
 					confirmed={this.props.confirmed}
 					handleSwitch={this.props.handleSwitch}
@@ -202,9 +210,9 @@ var UrlItemButtons = React.createClass({
 		var buttons = [
 			<button
 				onClick={this.props.handleSwitch.bind(null, this.props.url)}
-				className="btn-floating btn-small waves-effect waves-light red"
+				className="btn-floating btn-small waves-effect waves-light"
 			>
-				<i className="material-icons">shuffle</i>
+				<i className="material-icons">repeat</i>
 			</button>
 		];
 		if (!this.props.confirmed) {
@@ -229,9 +237,31 @@ var UrlItemText = React.createClass({
 	render: function() {
 		return (
 			<td className="urlItemText">
-				{this.props.url}: {this.props.time}
+				<UrlItemUrlText url={this.props.url} />
+				<br />
+				<UrlItemTimeText time={this.props.time} />
 			</td>
 		);
+	}
+});
+
+var UrlItemUrlText = React.createClass({
+	render: function() {
+		return (
+			<span className="urlItemUrlText">
+				{this.props.url}
+			</span>
+		)
+	}
+});
+
+var UrlItemTimeText = React.createClass({
+	render: function() {
+		return (
+			<span className="urlItemTimeText">
+				{this.props.time}
+			</span>
+		)
 	}
 });
 
@@ -252,3 +282,5 @@ $( document ).ready(function() {
   		}
   	});
 });
+// ./node_modules/.bin/babel content-script-jsx.js > content-script.js
+

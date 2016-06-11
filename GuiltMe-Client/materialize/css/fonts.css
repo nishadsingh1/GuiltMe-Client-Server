@@ -33,9 +33,15 @@
     font-size: 14px;
 }
 
-.urlItemText {
+#contentSpan {
+	font-family: 'Roboto';
+	background-color: purple;
+}
+
+.urlItemUrlText {
 	width: 100%;
 	font-size: 14px;
+	font-weight: 500;
 }
 
 .urlItemButtons {
@@ -45,5 +51,6 @@
 }
 
 .classificationTable {
+	table-layout: fixed;
 	width: 100%;
 }

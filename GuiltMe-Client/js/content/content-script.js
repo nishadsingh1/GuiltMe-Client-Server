@@ -1,5 +1,4 @@
 //guiltme.js
-
 var ClassificationsBox = React.createClass({
 	displayName: "ClassificationsBox",
 
@@ -73,6 +72,9 @@ var ClassificationsBox = React.createClass({
 		this.setState(new_state);
 		this.updateBackground(new_state);
 	},
+	onUrlItemSelect: function onUrlItemSelect(url) {
+		console.log(url + " was clicked!");
+	},
 	render: function () {
 		return React.createElement(
 			"div",
@@ -81,6 +83,7 @@ var ClassificationsBox = React.createClass({
 				"div",
 				{ className: "col s5 offset-s1" },
 				React.createElement(ClassificationTable, {
+					onUrlItemSelect: this.onUrlItemSelect,
 					urls: this.state.work_urls,
 					urls_confirmed: this.state.work_urls_confirmed,
 					classification: "work",
@@ -92,6 +95,7 @@ var ClassificationsBox = React.createClass({
 				"div",
 				{ className: "col s5" },
 				React.createElement(ClassificationTable, {
+					onUrlItemSelect: this.onUrlItemSelect,
 					urls: this.state.procrastination_urls,
 					urls_confirmed: this.state.procrastination_urls_confirmed,
 					classification: "procrastination",
@@ -125,6 +129,7 @@ var ClassificationTable = React.createClass({
 					React.createElement(ClassificationHeader, { classification: this.props.classification })
 				),
 				React.createElement(UrlList, {
+					onUrlItemSelect: this.props.onUrlItemSelect,
 					classification: this.props.classification,
 					urls_confirmed: this.state.urls_confirmed,
 					urls: this.state.urls,
@@ -170,6 +175,9 @@ var UrlList = React.createClass({
 				time: this.state.urls_confirmed[url],
 				classification: this.props.classification,
 				confirmed: true,
+				onClick: function () {
+					console.log('hehe');
+				},
 				handleSwitch: this.props.handleSwitch
 			}));
 		}
@@ -180,6 +188,7 @@ var UrlList = React.createClass({
 				time: this.state.urls[url],
 				classification: this.props.classification,
 				confirmed: false,
+				onClick: this.props.onUrlItemSelect.bind(null, url),
 				handleSwitch: this.props.handleSwitch,
 				handleConfirm: this.props.handleConfirm
 			}));
@@ -198,11 +207,12 @@ var UrlItem = React.createClass({
 	render: function () {
 		return React.createElement(
 			"tr",
-			null,
+			{ onClick: this.props.onClick },
 			React.createElement(UrlItemText, {
 				url: this.props.url,
 				time: this.props.time
 			}),
+			React.createElement("br", null),
 			React.createElement(UrlItemButtons, {
 				confirmed: this.props.confirmed,
 				handleSwitch: this.props.handleSwitch,
@@ -221,12 +231,12 @@ var UrlItemButtons = React.createClass({
 			"button",
 			{
 				onClick: this.props.handleSwitch.bind(null, this.props.url),
-				className: "btn-floating btn-small waves-effect waves-light red"
+				className: "btn-floating btn-small waves-effect waves-light"
 			},
 			React.createElement(
 				"i",
 				{ className: "material-icons" },
-				"shuffle"
+				"repeat"
 			)
 		)];
 		if (!this.props.confirmed) {
@@ -258,8 +268,32 @@ var UrlItemText = React.createClass({
 		return React.createElement(
 			"td",
 			{ className: "urlItemText" },
-			this.props.url,
-			": ",
+			React.createElement(UrlItemUrlText, { url: this.props.url }),
+			React.createElement("br", null),
+			React.createElement(UrlItemTimeText, { time: this.props.time })
+		);
+	}
+});
+
+var UrlItemUrlText = React.createClass({
+	displayName: "UrlItemUrlText",
+
+	render: function () {
+		return React.createElement(
+			"span",
+			{ className: "urlItemUrlText" },
+			this.props.url
+		);
+	}
+});
+
+var UrlItemTimeText = React.createClass({
+	displayName: "UrlItemTimeText",
+
+	render: function () {
+		return React.createElement(
+			"span",
+			{ className: "urlItemTimeText" },
 			this.props.time
 		);
 	}
@@ -275,4 +309,5 @@ $(document).ready(function () {
 		}
 	});
 });
+// ./node_modules/.bin/babel content-script-jsx.js > content-script.js
 

@@ -46,11 +46,11 @@ class FeatureVectorCreator
       end
     end
 
-    ['com', 'net', 'edu', 'org', 'me', 'io'].each do |extension|
-      define_method("f_extension_is_#{extension}") do |url, laplace_factor|
-        extension == URI.parse(url).host.split('.').last ? 1 : 0
-      end
-    end
+    # ['com', 'net', 'edu', 'org', 'me', 'io'].each do |extension|
+    #   define_method("f_extension_is_#{extension}") do |url, laplace_factor|
+    #     extension == URI.parse(url).host.split('.').last ? 1 : 0
+    #   end
+    # end
 
   end
 end

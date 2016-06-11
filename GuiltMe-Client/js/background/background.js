@@ -7,6 +7,22 @@ var work_urls_confirmed = {}
 var procrastination_urls = {}
 var procrastination_urls_confirmed = {}
 
+function extractDomain(url) {
+    var domain;
+    //find & remove protocol (http, ftp, etc.) and get domain
+    if (url.indexOf("://") > -1) {
+        domain = url.split('/')[2];
+    }
+    else {
+        domain = url.split('/')[0];
+    }
+
+    //find & remove port number
+    domain = domain.split(':')[0];
+
+    return domain;
+}
+
 var current_classification = function(url) {
   if (url in work_urls) {
     return work_urls;
@@ -22,6 +38,7 @@ var current_classification = function(url) {
 }
 
 var update =  function(current_url) {
+  current_url = extractDomain(current_url);
   var now = new Date().getTime() / 1000;
   var difference = now - last_time;
   url_classification = current_classification(last_url);
