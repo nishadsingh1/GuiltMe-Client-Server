@@ -254,17 +254,18 @@ const UrlItemTimeText = React.createClass({
 });
 
 $( document ).ready(function() {
-	chrome.runtime.sendMessage({message: "initialize"}, function(response) {
+	const attachElementId = 'content';
+	chrome.runtime.sendMessage({message: INITIALIZE}, function(response) {
 		ReactDOM.render(
 					<ClassificationsBox urls={response}/>,
-					document.getElementById('content')
+					document.getElementById(attachElementId)
 				);
   	});
   	chrome.runtime.onMessage.addListener(function(request, sender, func) {
-  		if (request.message == 'update') {
+  		if (request.message == UPDATE) {
   			ReactDOM.render(
 					<ClassificationsBox urls={request.data}/>,
-					document.getElementById('content')
+					document.getElementById(attachElementId)
 				);
   		}
   	});

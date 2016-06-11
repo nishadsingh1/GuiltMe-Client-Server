@@ -10,11 +10,11 @@
   },
 
   "background": {
-    "scripts": ["js/lib/jquery-2.1.4.min.js", "js/background/background.js"]
+    "scripts": ["js/lib/jquery-2.1.4.min.js", "js/background/background.js", "js/const/const.js"]
   },
 
   "content_scripts": [ {
-    "js": ["js/content/content-script.js"],
+    "js": ["js/content/content-script.js", "js/const/const.js"],
     "matches": [ "*://*.newtab/*"], 
     "css": [ "materialize/css/materialize.min.css", "css/content.css"]
   }],
