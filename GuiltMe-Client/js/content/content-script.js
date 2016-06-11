@@ -14,6 +14,7 @@ const ClassificationsBox = React.createClass({
 		const work_urls_confirmed = this.state.work_urls_confirmed;
 		const procrastination_urls = this.state.procrastination_urls;
 		const procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+
 		const get_old_and_new_url_classification = function () {
 			if (url in work_urls) {
 				return [work_urls, procrastination_urls_confirmed];
@@ -69,6 +70,7 @@ const ClassificationsBox = React.createClass({
 	},
 	onUrlItemSelect: function (url) {
 		console.log(url + " was clicked!");
+		/* TODO: update this to open up side panel */
 	},
 	render: function () {
 		return React.createElement(
