@@ -191,7 +191,6 @@ var UrlItem = React.createClass({
 					url={this.props.url}
 					time={this.props.time}
 				/>
-				<br />
 				<UrlItemButtons
 					confirmed={this.props.confirmed}
 					handleSwitch={this.props.handleSwitch}
@@ -207,6 +206,7 @@ var UrlItemButtons = React.createClass({
 	render: function() {
 		var buttons = [
 			<button
+				key="switch"
 				onClick={this.props.handleSwitch.bind(null, this.props.url)}
 				className="btn-floating btn-small waves-effect waves-light"
 			>
@@ -216,11 +216,12 @@ var UrlItemButtons = React.createClass({
 		if (!this.props.confirmed) {
 			buttons.push (
 				<button
-						onClick={this.props.handleConfirm.bind(null, this.props.url)}
-						className="btn-floating btn-small waves-effect waves-light green"
-					>
-						<i className="material-icons">done</i>
-					</button>
+					key="confirm"
+					onClick={this.props.handleConfirm.bind(null, this.props.url)}
+					className="btn-floating btn-small waves-effect waves-light green"
+				>
+					<i className="material-icons">done</i>
+				</button>
 			);
 		}
 		return (
