@@ -147,12 +147,8 @@ var ClassificationHeader = React.createClass({
 	render: function () {
 		return React.createElement(
 			"tr",
-			null,
-			React.createElement(
-				"h3",
-				null,
-				this.props.classification
-			)
+			{ className: "classificationHeaderText" },
+			this.props.classification
 		);
 	}
 });
@@ -175,9 +171,7 @@ var UrlList = React.createClass({
 				time: this.state.urls_confirmed[url],
 				classification: this.props.classification,
 				confirmed: true,
-				onClick: function () {
-					console.log('hehe');
-				},
+				onClick: this.props.onUrlItemSelect.bind(null, url),
 				handleSwitch: this.props.handleSwitch
 			}));
 		}
@@ -309,5 +303,5 @@ $(document).ready(function () {
 		}
 	});
 });
-// ./node_modules/.bin/babel content-script-jsx.js > content-script.js
+// ../../node_modules/.bin/babel content-script-jsx.js > content-script.js
 

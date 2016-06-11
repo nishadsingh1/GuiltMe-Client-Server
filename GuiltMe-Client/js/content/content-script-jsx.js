@@ -132,10 +132,8 @@ var ClassificationTable = React.createClass({
 var ClassificationHeader = React.createClass({
 	render: function() {
 		return (
-			<tr>
-				<h3>
-					{this.props.classification}
-				</h3>
+			<tr className="classificationHeaderText">
+				{this.props.classification}
 			</tr>
 		);
 	}
@@ -282,5 +280,5 @@ $( document ).ready(function() {
   		}
   	});
 });
-// ./node_modules/.bin/babel content-script-jsx.js > content-script.js
+// ../../node_modules/.bin/babel content-script-jsx.js > content-script.js
 
