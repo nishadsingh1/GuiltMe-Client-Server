@@ -1,0 +1,19 @@
+{
+  "name": "react-guiltme",
+  "version": "0.0.1",
+  "description": "Guiltme",
+  "main": "js/content/jsx/content-script.react.js",
+  "scripts": {
+    "build": "webpack --progress",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "babel-core": "^5.8.23",
+    "babel-loader": "^5.3.2",
+    "webpack": "^1.12.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.13.3",
+    "express": "^4.13.3"
+  }
+}
