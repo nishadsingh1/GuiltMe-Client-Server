@@ -9,7 +9,7 @@ const ClassificationTable = React.createClass({
 			<div className="classificationTable">
 				<table className="highlight classificationTable">
 					<thead>
-							<ClassificationHeader classification={this.props.classification} />
+						<ClassificationHeader classification={this.props.classification} />
 					</thead>
 					<UrlList
 						onUrlItemSelect={this.props.onUrlItemSelect}

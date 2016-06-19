@@ -9,15 +9,15 @@ let work_urls = {}
 let work_urls_confirmed = {}
 
 function extractDomain(url) {
-    let domain;
-    if (url.indexOf("://") > -1) {
-        domain = url.split('/')[2];
-    }
-    else {
-        domain = url.split('/')[0];
-    }
-    domain = domain.split(':')[0];
-    return domain;
+  let domain;
+  if (url.indexOf("://") > -1) {
+    domain = url.split('/')[2];
+  }
+  else {
+    domain = url.split('/')[0];
+  }
+  domain = domain.split(':')[0];
+  return domain;
 }
 
 const current_classification = function(url) {
@@ -64,15 +64,19 @@ chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.message == INITIALIZE) {
       // delete current_classification("chrome://newtab/")["chrome://newtab/"];
-      sendResponse(
-        {
-          work_urls: work_urls,
-          work_urls_confirmed: work_urls_confirmed,
-          procrastination_urls: procrastination_urls,
-          procrastination_urls_confirmed: procrastination_urls_confirmed,
-        }
-      );
+      sendResponse({
+        work_urls: work_urls,
+        work_urls_confirmed: work_urls_confirmed,
+        procrastination_urls: procrastination_urls,
+        procrastination_urls_confirmed: procrastination_urls_confirmed,
+      });
     } else if (request.message == UPDATE) {
+      chrome.tabs.sendMessage(
+        sender.tab.id,
+        {message: UPDATE, data: request.data},
+        function(response) {}
+      );
+
       work_urls = request.data.work_urls;
       procrastination_urls = request.data.procrastination_urls;
       procrastination_urls_confirmed = request.data.procrastination_urls_confirmed;

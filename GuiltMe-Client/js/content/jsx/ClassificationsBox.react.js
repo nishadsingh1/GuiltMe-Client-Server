@@ -3,19 +3,11 @@ const React = require('react');
 const ClassificationTable = require('./ClassificationTable.react')
 
 const ClassificationsBox = React.createClass({
-	getInitialState: function() {
-		return {
-			work_urls: this.props.urls.work_urls,
-			work_urls_confirmed: this.props.urls.work_urls_confirmed,
-			procrastination_urls: this.props.urls.procrastination_urls,
-			procrastination_urls_confirmed: this.props.urls.procrastination_urls_confirmed
-		};
-	},
 	handleSwitch: function(url) {
-		const work_urls = this.state.work_urls;
-		const work_urls_confirmed = this.state.work_urls_confirmed;
-		const procrastination_urls = this.state.procrastination_urls;
-		const procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+		const work_urls = this.props.urls.work_urls;
+		const work_urls_confirmed = this.props.urls.work_urls_confirmed;
+		const procrastination_urls = this.props.urls.procrastination_urls;
+		const procrastination_urls_confirmed = this.props.urls.procrastination_urls_confirmed;
 
 		const get_old_and_new_url_classification = function() {
 			if (url in work_urls) {
@@ -44,14 +36,13 @@ const ClassificationsBox = React.createClass({
 		});
 	},
 	update: function(new_state) {
-		this.setState(new_state);
 		chrome.runtime.sendMessage({message: UPDATE, data: new_state}, function(response) {});
 	},
 	handleConfirm: function(url) {
-		const work_urls = this.state.work_urls;
-		const work_urls_confirmed = this.state.work_urls_confirmed;
-		const procrastination_urls = this.state.procrastination_urls;
-		const procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+		const work_urls = this.props.urls.work_urls;
+		const work_urls_confirmed = this.props.urls.work_urls_confirmed;
+		const procrastination_urls = this.props.urls.procrastination_urls;
+		const procrastination_urls_confirmed = this.props.urls.procrastination_urls_confirmed;
 		let new_classification_name;
 		if (url in work_urls) {
 			work_urls_confirmed[url] = work_urls[url];
@@ -74,13 +65,14 @@ const ClassificationsBox = React.createClass({
 		/* TODO: update this to open up side panel */
 	},
 	render: function() {
+		console.log(this.state);
 		return (
 			<div className="classificationsBox row">
 					<div className="col s5 offset-s1">
 						<ClassificationTable
 							onUrlItemSelect={this.onUrlItemSelect}
-							urls={this.state.work_urls}
-							urls_confirmed={this.state.work_urls_confirmed}
+							urls={this.props.urls.work_urls}
+							urls_confirmed={this.props.urls.work_urls_confirmed}
 							classification="work"
 							handleSwitch={this.handleSwitch}
 							handleConfirm={this.handleConfirm}
@@ -89,8 +81,8 @@ const ClassificationsBox = React.createClass({
 					<div className="col s5">
 						<ClassificationTable
 							onUrlItemSelect={this.onUrlItemSelect}
-							urls={this.state.procrastination_urls}
-							urls_confirmed={this.state.procrastination_urls_confirmed}
+							urls={this.props.urls.procrastination_urls}
+							urls_confirmed={this.props.urls.procrastination_urls_confirmed}
 							classification="procrastination"
 							handleSwitch={this.handleSwitch}
 							handleConfirm={this.handleConfirm}

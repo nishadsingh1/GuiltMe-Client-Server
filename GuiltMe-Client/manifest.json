@@ -10,22 +10,25 @@
   },
 
   "background": {
-    "scripts":
-      [
-        "js/lib/jquery-2.1.4.min.js",
-        "js/background/background.js",
-        "js/const/upstream/upstream_const.js"
-      ]
+    "scripts": [
+      "lib/js/jquery-2.1.4.min.js",
+      "js/background/background.js",
+      "js/const/upstream/upstream_const.js"
+    ]
   },
 
-  "content_scripts": [ {
+  "content_scripts": [{
     "js": [
+      "lib/js/jquery-2.1.4.min.js",
       "js/const/content/content_const.js",
       "js/const/upstream/upstream_const.js",
       "js/content/public/main.js"
     ],
-    "matches": [ "*://*.newtab/*"], 
-    "css": [ "materialize/css/materialize.min.css", "css/content.css"]
+    "matches": ["*://*.newtab/*"], 
+    "css": [
+      "lib/materialize/css/materialize.min.css",
+      "css/content.css"
+    ]
   }],
 
   "permissions": [
@@ -39,5 +42,4 @@
   "web_accessible_resources": ["materialize.min.css"],
 
   "content_security_policy":"script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'"
-
 }

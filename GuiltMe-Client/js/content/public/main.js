@@ -51,13 +51,13 @@
 	var ClassificationsBox = __webpack_require__(2);
 
 	$(document).ready(function () {
-		var attachElementId = 'content';
+		var attachElement = document.getElementById(ATTACH_ELEMENT_ID);
 		chrome.runtime.sendMessage({ message: INITIALIZE }, function (response) {
-			ReactDOM.render(React.createElement(ClassificationsBox, { urls: response }), document.getElementById(attachElementId));
+			ReactDOM.render(React.createElement(ClassificationsBox, { urls: response }), attachElement);
 		});
 		chrome.runtime.onMessage.addListener(function (request, sender, func) {
 			if (request.message == UPDATE) {
-				ReactDOM.render(React.createElement(ClassificationsBox, { urls: request.data }), document.getElementById(attachElementId));
+				ReactDOM.render(React.createElement(ClassificationsBox, { urls: request.data }), attachElement);
 			}
 		});
 	});
@@ -81,19 +81,11 @@
 	var ClassificationsBox = React.createClass({
 		displayName: 'ClassificationsBox',
 
-		getInitialState: function getInitialState() {
-			return {
-				work_urls: this.props.urls.work_urls,
-				work_urls_confirmed: this.props.urls.work_urls_confirmed,
-				procrastination_urls: this.props.urls.procrastination_urls,
-				procrastination_urls_confirmed: this.props.urls.procrastination_urls_confirmed
-			};
-		},
 		handleSwitch: function handleSwitch(url) {
-			var work_urls = this.state.work_urls;
-			var work_urls_confirmed = this.state.work_urls_confirmed;
-			var procrastination_urls = this.state.procrastination_urls;
-			var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+			var work_urls = this.props.urls.work_urls;
+			var work_urls_confirmed = this.props.urls.work_urls_confirmed;
+			var procrastination_urls = this.props.urls.procrastination_urls;
+			var procrastination_urls_confirmed = this.props.urls.procrastination_urls_confirmed;
 
 			var get_old_and_new_url_classification = function get_old_and_new_url_classification() {
 				if (url in work_urls) {
@@ -122,14 +114,13 @@
 			});
 		},
 		update: function update(new_state) {
-			this.setState(new_state);
 			chrome.runtime.sendMessage({ message: UPDATE, data: new_state }, function (response) {});
 		},
 		handleConfirm: function handleConfirm(url) {
-			var work_urls = this.state.work_urls;
-			var work_urls_confirmed = this.state.work_urls_confirmed;
-			var procrastination_urls = this.state.procrastination_urls;
-			var procrastination_urls_confirmed = this.state.procrastination_urls_confirmed;
+			var work_urls = this.props.urls.work_urls;
+			var work_urls_confirmed = this.props.urls.work_urls_confirmed;
+			var procrastination_urls = this.props.urls.procrastination_urls;
+			var procrastination_urls_confirmed = this.props.urls.procrastination_urls_confirmed;
 			var new_classification_name = undefined;
 			if (url in work_urls) {
 				work_urls_confirmed[url] = work_urls[url];
@@ -152,6 +143,7 @@
 			/* TODO: update this to open up side panel */
 		},
 		render: function render() {
+			console.log(this.state);
 			return React.createElement(
 				'div',
 				{ className: 'classificationsBox row' },
@@ -160,8 +152,8 @@
 					{ className: 'col s5 offset-s1' },
 					React.createElement(ClassificationTable, {
 						onUrlItemSelect: this.onUrlItemSelect,
-						urls: this.state.work_urls,
-						urls_confirmed: this.state.work_urls_confirmed,
+						urls: this.props.urls.work_urls,
+						urls_confirmed: this.props.urls.work_urls_confirmed,
 						classification: 'work',
 						handleSwitch: this.handleSwitch,
 						handleConfirm: this.handleConfirm
@@ -172,8 +164,8 @@
 					{ className: 'col s5' },
 					React.createElement(ClassificationTable, {
 						onUrlItemSelect: this.onUrlItemSelect,
-						urls: this.state.procrastination_urls,
-						urls_confirmed: this.state.procrastination_urls_confirmed,
+						urls: this.props.urls.procrastination_urls,
+						urls_confirmed: this.props.urls.procrastination_urls_confirmed,
 						classification: 'procrastination',
 						handleSwitch: this.handleSwitch,
 						handleConfirm: this.handleConfirm
@@ -228,9 +220,11 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	var React = __webpack_require__(1);
 
 	var ClassificationHeader = React.createClass({
 		displayName: "ClassificationHeader",
@@ -261,9 +255,10 @@
 		render: function render() {
 			var urls_items = [];
 			var url = undefined;
+			var i = 0;
 			for (url in this.props.urls_confirmed) {
 				urls_items.push(React.createElement(UrlItem, {
-					key: url,
+					key: i,
 					url: url,
 					time: this.props.urls_confirmed[url],
 					classification: this.props.classification,
@@ -271,10 +266,11 @@
 					onClick: this.props.onUrlItemSelect.bind(null, url),
 					handleSwitch: this.props.handleSwitch
 				}));
+				i += 1;
 			}
 			for (url in this.props.urls) {
 				urls_items.push(React.createElement(UrlItem, {
-					key: url,
+					key: i,
 					url: url,
 					time: this.props.urls[url],
 					classification: this.props.classification,
@@ -283,6 +279,7 @@
 					handleSwitch: this.props.handleSwitch,
 					handleConfirm: this.props.handleConfirm
 				}));
+				i += 1;
 			}
 			return React.createElement(
 				'tbody',
