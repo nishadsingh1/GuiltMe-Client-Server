@@ -1,0 +1,60 @@
+.classificationHeaderText {
+	font-size: 35px;
+	font-weight: 400;
+}
+
+.ss {
+  font-size: 14px;
+  overflow: hidden;
+  position: relative;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+#contentSpan {
+	font-family: 'Roboto';
+	background-color: purple;
+}
+
+.urlItemUrlText {
+	width: 100%;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.urlItemButtons {
+	width: auto;
+    text-align: right;
+    white-space: nowrap
+}
+
+.classificationTable {
+	table-layout: fixed;
+	width: 100%;
+}
+
+/* fallback */
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url("../../lib/icons/material-icons.woff2") format('woff2');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

@@ -6,28 +6,27 @@
   "version": "1.0",
 
   "chrome_url_overrides": {
-    "newtab": "html/index.html"
+    "newtab": "src/html/index.html"
   },
 
   "background": {
     "scripts": [
       "lib/js/jquery-2.1.4.min.js",
-      "js/background/background.js",
-      "js/const/upstream/upstream_const.js"
+      "src/js/background/background.js",
+      "src/js/const/upstream/upstream_const.js"
     ]
   },
 
   "content_scripts": [{
     "js": [
       "lib/js/jquery-2.1.4.min.js",
-      "js/const/content/content_const.js",
-      "js/const/upstream/upstream_const.js",
-      "js/content/public/main.js"
+      "src/js/const/content/content_const.js",
+      "src/js/const/upstream/upstream_const.js",
+      "src/js/content/public/main.js"
     ],
     "matches": ["*://*.newtab/*"], 
     "css": [
-      "lib/materialize/css/materialize.min.css",
-      "css/content.css"
+      "src/css/content.css"
     ]
   }],
 

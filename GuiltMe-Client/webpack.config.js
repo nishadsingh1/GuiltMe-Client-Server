@@ -1,10 +1,10 @@
 var webpack = require('webpack');
 
 module.exports = {
-  entry: './js/content/jsx/content-script.react.js',
+  entry: './src/js/content/jsx/content-script.react.js',
   output: {
     // Output the bundled file.
-    path: './js/content/public',
+    path: './src/js/content/public',
     // Use the name specified in the entry key as name for the bundle file.
     filename: 'main.js'
   },
